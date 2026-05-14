@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Market Intelligence — US & India</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#06080d; --surface:#0c1018; --s2:#111620; --s3:#171d28;
+  --border:#1e2535; --border2:#252d3d; --text:#e2e8f5; --muted:#6b7a99; --faint:#2a3350;
+  --us:#4f8ef7; --us-g:rgba(79,142,247,.15); --us-a:#60a5fa;
+  --in:#f97316; --in-g:rgba(249,115,22,.15); --in-a:#fb923c;
+  --rec:#a78bfa; --rec-g:rgba(167,139,250,.15);
+  --green:#22c55e; --green-d:rgba(34,197,94,.12);
+  --red:#ef4444; --red-d:rgba(239,68,68,.12);
+  --yellow:#eab308; --yellow-d:rgba(234,179,8,.1);
+  --fd:'Syne',sans-serif; --fm:'Space Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--fd);font-size:13px;min-height:100vh;overflow-x:hidden}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--us),var(--in));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.logo-name{font-size:16px;font-weight:800;letter-spacing:-.4px}
+.logo-sub{font-size:10px;color:var(--muted);font-family:var(--fm);margin-top:1px}
+.main-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.mtab{padding:8px 18px;border-radius:7px;border:1px solid var(--border2);background:var(--surface);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:var(--fd)}
+.mtab.t-us{background:var(--us-g);border-color:var(--us);color:var(--us-a)}
+.mtab.t-in{background:var(--in-g);border-color:var(--in);color:var(--in-a)}
+.mtab.t-rec{background:var(--rec-g);border-color:var(--rec);color:var(--rec)}
+.live{display:flex;align-items:center;gap:6px;font-family:var(--fm);font-size:10px;color:var(--muted)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.ticker{background:var(--surface);border-bottom:1px solid var(--border);padding:7px 0;overflow:hidden;font-family:var(--fm);font-size:11px}
+.tick-inner{display:flex;gap:28px;animation:scroll 50s linear infinite;white-space:nowrap;width:max-content}
+.tick-inner:hover{animation-play-state:paused}
+@keyframes scroll{to{transform:translateX(-50%)}}
+.ti{display:inline-flex;align-items:center;gap:5px;padding:0 6px}
+.ts{font-weight:700;color:var(--text)}.tv{color:var(--muted)}
+
+.wrap{max-width:1560px;margin:0 auto;padding:24px 28px 60px}
+.view{display:none}.view.active{display:block}
+
+.mkt-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.mkt-flag{font-size:30px;margin-bottom:3px}
+.mkt-title{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1}
+.mkt-sub{font-size:11px;color:var(--muted);font-family:var(--fm);margin-top:4px}
+.index-row{display:flex;gap:8px;flex-wrap:wrap}
+.ix{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:120px}
+.ix-lbl{font-size:9px;font-family:var(--fm);color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.ix-val{font-size:18px;font-weight:700;font-family:var(--fm)}
+.ix-chg{font-size:10px;font-weight:600;font-family:var(--fm);margin-top:2px}
+.c-us{color:var(--us-a)}.c-in{color:var(--in-a)}.pos{color:var(--green)}.neg{color:var(--red)}.neu{color:var(--muted)}
+
+.ov-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px;margin-bottom:22px}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 14px}
+.ov-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.ov-val{font-size:17px;font-weight:700;font-family:var(--fm)}
+.ov-hint{font-size:9px;color:var(--muted);font-family:var(--fm);margin-top:2px}
+
+.ai-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:22px;position:relative;overflow:hidden}
+.ai-panel::after{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;pointer-events:none}
+.ap-us::after{background:radial-gradient(var(--us-g),transparent 70%)}
+.ap-in::after{background:radial-gradient(var(--in-g),transparent 70%)}
+.ai-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.ai-title{font-size:13px;font-weight:700}
+.ai-ts{font-size:10px;color:var(--muted);font-family:var(--fm);margin-left:auto}
+.ai-steps{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.ai-step{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:4px;border:1px solid var(--border2);color:var(--muted);background:var(--s2)}
+.ai-step.done{border-color:var(--green);color:var(--green);background:var(--green-d)}
+.ai-step.active{border-color:var(--rec);color:var(--rec);background:var(--rec-g);animation:stepPulse 1s infinite}
+@keyframes stepPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.ai-out{font-size:13px;line-height:1.8;color:#c8d3ea;min-height:50px}
+.ai-out.idle{color:var(--muted);font-style:italic}
+.refresh-btn{margin-top:12px;padding:7px 16px;background:var(--s2);border:1px solid var(--border2);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fd);transition:all .15s}
+.refresh-btn:hover{color:var(--text);border-color:var(--faint)}
+.refresh-btn:disabled{opacity:.5;cursor:not-allowed}
+
+.shdr{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.shdr h2{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.tag{font-size:9px;font-family:var(--fm);padding:2px 7px;border-radius:4px;font-weight:700}
+.tag-us{background:var(--us-g);color:var(--us-a);border:1px solid rgba(79,142,247,.3)}
+.tag-in{background:var(--in-g);color:var(--in-a);border:1px solid rgba(249,115,22,.3)}
+
+.sf{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.sf-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--fd)}
+.sf-btn.on-us{background:var(--us-g);border-color:var(--us);color:var(--us-a)}
+.sf-btn.on-in{background:var(--in-g);border-color:var(--in);color:var(--in-a)}
+
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:11px;margin-bottom:26px}
+.co-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:15px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s}
+.co-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .2s}
+.co-card.us-c::before{background:linear-gradient(90deg,var(--us),transparent)}
+.co-card.in-c::before{background:linear-gradient(90deg,var(--in),transparent)}
+.co-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.co-card:hover::before{opacity:1}
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.cc-ticker{font-family:var(--fm);font-size:10px;color:var(--muted)}
+.cc-name{font-size:14px;font-weight:700;margin-top:1px;line-height:1.2}
+.cc-desc{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
+.cc-price{font-family:var(--fm);font-size:15px;font-weight:700;text-align:right}
+.cc-chg{font-family:var(--fm);font-size:10px;text-align:right;margin-top:2px}
+.cc-metrics{display:flex;gap:10px;margin:9px 0;padding:8px;background:var(--s2);border-radius:7px}
+.cc-m{flex:1;text-align:center}
+.cc-m .ml{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.cc-m .mv{font-size:11px;font-family:var(--fm);font-weight:700}
+.bar-wrap{height:3px;background:var(--border);border-radius:2px;margin:6px 0;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width .6s}
+
+/* Agent progress on card */
+.card-steps{display:flex;gap:4px;margin:8px 0;flex-wrap:wrap}
+.cs{font-size:9px;font-family:var(--fm);padding:2px 6px;border-radius:3px;border:1px solid var(--border2);color:var(--muted)}
+.cs.done{border-color:var(--green);color:var(--green)}
+.cs.run{border-color:var(--rec);color:var(--rec);animation:stepPulse 1s infinite}
+
+.co-analysis{background:var(--s2);border-radius:7px;padding:9px 11px;margin-top:8px;font-size:11px;line-height:1.65;color:#b8c8e8;border-left:2px solid var(--border2);display:none}
+.co-analysis.vis{display:block}
+.co-analysis.al-us{border-left-color:var(--us)}
+.co-analysis.al-in{border-left-color:var(--in)}
+.verdict{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700;font-family:var(--fm);margin-top:6px}
+.vd-buy{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.vd-hold{background:var(--yellow-d);color:var(--yellow);border:1px solid rgba(234,179,8,.3)}
+.vd-wait{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.ai-btn{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;margin-top:9px;padding:7px 11px;background:var(--s2);border:1px solid var(--border2);border-radius:7px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--fd)}
+.ai-btn:hover{background:var(--s3);color:var(--text)}
+.ai-btn.btn-us:hover{border-color:var(--us);color:var(--us-a)}
+.ai-btn.btn-in:hover{border-color:var(--in);color:var(--in-a)}
+.ai-btn:disabled{opacity:.6;cursor:not-allowed}
+.spin{display:inline-block;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── REC VIEW ── */
+.rec-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.rec-title h1{font-size:26px;font-weight:800;letter-spacing:-1px;background:linear-gradient(90deg,var(--rec),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.rec-title p{font-size:11px;color:var(--muted);font-family:var(--fm);margin-top:4px}
+.rec-controls{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rf-btn{padding:6px 13px;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fd);transition:all .15s}
+.rf-btn.on{background:var(--rec-g);border-color:var(--rec);color:var(--rec)}
+.gen-btn{padding:8px 18px;background:linear-gradient(135deg,rgba(167,139,250,.2),rgba(167,139,250,.08));border:1px solid var(--rec);border-radius:7px;color:var(--rec);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:all .15s}
+.gen-btn:hover{background:var(--rec-g)}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed}
+
+.rs-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:18px}
+.rs-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 14px;text-align:center}
+.rs-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.rs-val{font-size:20px;font-weight:800;font-family:var(--fm)}
+
+/* Progress bar for generate-all */
+.gen-progress{display:none;margin-bottom:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:9px}
+.gen-progress.vis{display:block}
+.gp-label{font-size:11px;color:var(--rec);font-family:var(--fm);margin-bottom:6px}
+.gp-bar-wrap{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.gp-bar{height:100%;background:linear-gradient(90deg,var(--rec),var(--us-a));border-radius:2px;transition:width .4s}
+
+.tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table.rtbl{width:100%;border-collapse:collapse}
+.rtbl thead th{background:var(--s2);padding:10px 14px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0;z-index:2;white-space:nowrap}
+.rtbl th.r,.rtbl td.r{text-align:right}
+.rtbl td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:top}
+.rtbl tr:last-child td{border-bottom:none}
+.rtbl tr:hover td{background:rgba(255,255,255,.015)}
+.r-sym{font-weight:700;font-size:13px;font-family:var(--fm)}
+.r-name{font-size:10px;color:var(--muted);margin-top:2px}
+.rmkt{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;display:inline-block;margin-top:3px}
+.rmkt-us{background:var(--us-g);color:var(--us-a)}
+.rmkt-in{background:var(--in-g);color:var(--in-a)}
+.lvl-block{min-width:130px}
+.lvl-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 0}
+.lvl-lbl{font-size:9px;color:var(--muted);width:44px;font-family:var(--fm)}
+.lvl-val{font-family:var(--fm);font-weight:700;font-size:12px}
+.ev{color:var(--yellow)}.tv2{color:var(--green)}.sv{color:var(--red)}
+.lvl-sub{font-size:9px;color:var(--muted);margin-left:4px;font-family:var(--fm)}
+.insight-txt{font-size:11px;color:#a8b8d8;line-height:1.65;max-width:280px;font-family:var(--fd)}
+.insight-idle{color:var(--muted);font-style:italic;font-size:11px;margin-bottom:6px}
+.insight-btn{padding:5px 12px;background:linear-gradient(135deg,var(--rec-g),transparent);border:1px solid var(--rec);border-radius:5px;color:var(--rec);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:all .15s}
+.insight-btn:hover{background:var(--rec-g)}
+.insight-btn:disabled{opacity:.5;cursor:not-allowed}
+.tf-badge{font-size:10px;color:var(--muted);background:var(--s3);padding:3px 8px;border-radius:5px;display:inline-block;border:1px solid var(--border);font-family:var(--fm)}
+.up-val{font-size:13px;font-weight:700;font-family:var(--fm)}
+.rb{width:10px;height:5px;border-radius:1px}
+.risk-row{display:flex;align-items:center;gap:5px;margin-top:5px}
+.risk-lbl{font-size:9px;color:var(--muted)}
+.row-agent-log{font-size:10px;color:var(--rec);font-family:var(--fm);margin-top:5px;min-height:14px}
+
+.footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer p{font-size:10px;color:var(--faint);font-family:var(--fm)}
+
+@media(max-width:700px){
+  .topbar{flex-direction:column;align-items:flex-start;gap:10px}
+  .mkt-hdr,.rec-hdr{flex-direction:column}
+}
+
+/* ══ TRADING AGENT TAB ══ */
+.mtab.t-trade{background:rgba(34,197,94,.12);border-color:var(--green);color:var(--green)}
+.trade-setup{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:860px){.trade-setup{grid-template-columns:1fr}}
+.broker-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.broker-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.broker-icon{font-size:22px}
+.broker-name{font-size:15px;font-weight:700}
+.broker-badge{font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700;font-family:var(--fm)}
+.bb-paper{background:var(--yellow-d);color:var(--yellow);border:1px solid rgba(234,179,8,.3)}
+.bb-live{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.bb-off{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.inp-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.inp-lbl{font-size:10px;color:var(--muted);font-family:var(--fm);text-transform:uppercase;letter-spacing:.5px}
+.inp{width:100%;padding:8px 11px;background:var(--s2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:12px;outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--green)}
+.inp::placeholder{color:var(--faint)}
+.connect-btn{width:100%;padding:9px;background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(34,197,94,.08));border:1px solid var(--green);border-radius:7px;color:var(--green);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:all .15s;margin-top:4px}
+.connect-btn:hover{background:var(--green-d)}
+.connect-btn:disabled{opacity:.5;cursor:not-allowed}
+.conn-status{font-size:11px;font-family:var(--fm);margin-top:8px;padding:7px 10px;border-radius:6px;display:none}
+.conn-status.vis{display:block}
+.cs-ok{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.cs-err{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.acct-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.acct-item{background:var(--s2);border-radius:7px;padding:8px 10px;text-align:center}
+.acct-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.acct-val{font-size:14px;font-weight:700;font-family:var(--fm)}
+
+/* Rules engine */
+.rules-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}
+.rules-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.rules-hdr h2{font-size:14px;font-weight:700}
+.add-rule-btn{padding:7px 14px;background:var(--rec-g);border:1px solid var(--rec);border-radius:6px;color:var(--rec);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fd)}
+.rule-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:8px;align-items:center;padding:10px;background:var(--s2);border-radius:8px;margin-bottom:8px;border:1px solid var(--border)}
+@media(max-width:900px){.rule-row{grid-template-columns:1fr 1fr 1fr;}}
+.rule-sel{padding:7px 10px;background:var(--s3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--fm);font-size:11px;outline:none;cursor:pointer}
+.rule-inp{padding:7px 10px;background:var(--s3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--fm);font-size:11px;outline:none;width:100%}
+.rule-toggle{padding:5px 10px;border-radius:5px;border:1px solid var(--border2);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s}
+.rt-on{background:var(--green-d);color:var(--green);border-color:rgba(34,197,94,.4)}
+.rt-off{background:var(--red-d);color:var(--red);border-color:rgba(239,68,68,.4)}
+.rule-del{width:28px;height:28px;border-radius:5px;border:1px solid var(--border2);background:var(--s3);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s}
+.rule-del:hover{border-color:var(--red);color:var(--red)}
+.agent-run-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.agent-run-btn{padding:9px 20px;background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(34,197,94,.06));border:1px solid var(--green);border-radius:7px;color:var(--green);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);display:flex;align-items:center;gap:6px}
+.agent-run-btn:disabled{opacity:.5;cursor:not-allowed}
+.agent-status-bar{font-size:11px;color:var(--rec);font-family:var(--fm)}
+.agent-mode-sel{padding:7px 12px;background:var(--s2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--fm);font-size:11px;outline:none}
+
+/* Order log */
+.order-log{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.ol-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ol-hdr h2{font-size:14px;font-weight:700}
+.clear-log-btn{font-size:10px;color:var(--muted);background:none;border:1px solid var(--border2);border-radius:5px;padding:3px 8px;cursor:pointer;font-family:var(--fm)}
+.order-tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table.otbl{width:100%;border-collapse:collapse}
+.otbl th{background:var(--s2);padding:8px 12px;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.otbl td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:11px;font-family:var(--fm);vertical-align:top}
+.otbl tr:last-child td{border-bottom:none}
+.otbl tr:hover td{background:rgba(255,255,255,.01)}
+.order-type{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px}
+.ot-buy{background:var(--green-d);color:var(--green)}
+.ot-sell{background:var(--red-d);color:var(--red)}
+.order-status{font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700}
+.os-filled{background:var(--green-d);color:var(--green)}
+.os-pending{background:var(--yellow-d);color:var(--yellow)}
+.os-rejected{background:var(--red-d);color:var(--red)}
+.os-simulated{background:var(--rec-g);color:var(--rec)}
+.os-cancelled{background:rgba(100,100,100,.15);color:var(--muted)}
+.empty-log{text-align:center;padding:40px;color:var(--muted);font-style:italic;font-size:12px}
+
+
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">🌐</div>
+    <div>
+      <div class="logo-name">Market Intelligence</div>
+      <div class="logo-sub">3-Agent AI · India Market · 13 Stocks · No Key Needed</div>
+    </div>
+  </div>
+  <div class="main-tabs">
+    <button class="mtab t-in" id="tab-in" onclick="switchTab('in')">🇮🇳 India Market</button>
+    <button class="mtab" id="tab-rec" onclick="switchTab('rec')">⭐ Recommendations</button>
+    <button class="mtab" id="tab-trade" onclick="switchTab('trade')">🤖 Trading Agent</button>
+  </div>
+  <div class="live"><div class="dot"></div><span id="clock">—</span></div>
+</div>
+
+
+<div class="ticker"><div class="tick-inner" id="ticker"></div></div>
+
+<div class="wrap">
+
+<!-- ══ US VIEW ══ -->
+<!-- ══ INDIA VIEW ══ -->
+<div class="view active" id="view-in">
+  <div class="mkt-hdr">
+    <div>
+      <div class="mkt-flag">🇮🇳</div>
+      <div class="mkt-title" style="background:linear-gradient(90deg,var(--in),var(--in-a));-webkit-background-clip:text;-webkit-text-fill-color:transparent">India Market</div>
+      <div class="mkt-sub">NSE · BSE · 3-Agent AI Analysis</div>
+    </div>
+    <div class="index-row">
+      <div class="ix"><div class="ix-lbl">NIFTY 50</div><div class="ix-val c-in">24,346</div><div class="ix-chg pos">▲ 0.63%</div></div>
+      <div class="ix"><div class="ix-lbl">SENSEX</div><div class="ix-val c-in">80,218</div><div class="ix-chg pos">▲ 0.58%</div></div>
+      <div class="ix"><div class="ix-lbl">BANK NIFTY</div><div class="ix-val c-in">52,640</div><div class="ix-chg pos">▲ 0.44%</div></div>
+      <div class="ix"><div class="ix-lbl">India VIX</div><div class="ix-val pos">13.6</div><div class="ix-chg neu">Low Fear</div></div>
+    </div>
+  </div>
+  <div class="ov-strip">
+    <div class="ov-card"><div class="ov-lbl">INR/USD</div><div class="ov-val c-in">₹83.62</div><div class="ov-hint">Exchange</div></div>
+    <div class="ov-card"><div class="ov-lbl">Repo Rate</div><div class="ov-val c-in">6.50%</div><div class="ov-hint">RBI Policy</div></div>
+    <div class="ov-card"><div class="ov-lbl">GDP</div><div class="ov-val pos">6.8%</div><div class="ov-hint">FY25 est.</div></div>
+    <div class="ov-card"><div class="ov-lbl">CPI India</div><div class="ov-val pos">4.2%</div><div class="ov-hint">Inflation</div></div>
+    <div class="ov-card"><div class="ov-lbl">FII Flow</div><div class="ov-val pos">+₹3,240Cr</div><div class="ov-hint">Today net</div></div>
+    <div class="ov-card"><div class="ov-lbl">DII Flow</div><div class="ov-val pos">+₹1,890Cr</div><div class="ov-hint">Today net</div></div>
+  </div>
+  <div class="ai-panel ap-in">
+    <div class="ai-hdr">
+      <span>🤖</span><span class="ai-title">India Market Intelligence — 2-Agent Pipeline</span>
+      <span class="ai-ts" id="in-ts">—</span>
+    </div>
+    <div class="ai-steps" id="in-steps">
+      <span class="ai-step" id="in-s1">① News Scout</span>
+      <span class="ai-step" id="in-s2">② Strategist</span>
+    </div>
+    <div class="ai-out idle" id="in-summary">Click Refresh to run agents...</div>
+    <button class="refresh-btn" id="in-refresh-btn" onclick="fetchSummary('in')">⟳ Refresh Analysis</button>
+  </div>
+  <div class="shdr"><h2>Companies</h2><span class="tag tag-in">NSE/BSE · 13 STOCKS</span></div>
+  <div class="sf" id="in-sf">
+    <button class="sf-btn on-in" onclick="filterIN('all',this)">All</button>
+    <button class="sf-btn" onclick="filterIN('it',this)">IT Services</button>
+    <button class="sf-btn" onclick="filterIN('conglomerate',this)">Tata Group</button>
+    <button class="sf-btn" onclick="filterIN('food',this)">FMCG &amp; Food</button>
+    <button class="sf-btn" onclick="filterIN('mechanical',this)">Engineering</button>
+    <button class="sf-btn" onclick="filterIN('pharma',this)">Pharma</button>
+  </div>
+  <div class="co-grid" id="in-grid"></div>
+</div>
+
+<!-- ══ RECOMMENDATIONS VIEW ══ -->
+<div class="view" id="view-rec">
+  <div class="rec-hdr">
+    <div class="rec-title">
+      <div style="font-size:30px;margin-bottom:3px">⭐</div>
+      <h1>AI Recommendations</h1>
+      <p>🇮🇳 NSE/BSE · 3-Agent Pipeline: News Scout → Fundamentals → Synthesis · Entry · Target · Stop-Loss</p>
+    </div>
+    <div class="rec-controls">
+      <button class="rf-btn on" onclick="filterRec('all',this)">All Stocks</button>
+      
+      <button class="rf-btn" onclick="filterRec('buy',this)">✅ BUY Only</button>
+      <button class="rf-btn" onclick="filterRec('hold',this)">⏸ HOLD Only</button>
+      <button class="gen-btn" id="gen-btn" onclick="generateAll()">🤖 Analyse All 13 Stocks</button>
+    </div>
+  </div>
+
+  <div class="rs-strip">
+    <div class="rs-card"><div class="rs-lbl">Total Stocks</div><div class="rs-val" style="color:var(--rec)">13</div></div>
+    <div class="rs-card"><div class="rs-lbl">Analysed</div><div class="rs-val" style="color:var(--rec)" id="rs-done">0</div></div>
+    <div class="rs-card"><div class="rs-lbl">BUY Signals</div><div class="rs-val pos" id="rs-buy">—</div></div>
+    <div class="rs-card"><div class="rs-lbl">HOLD Signals</div><div class="rs-val" style="color:var(--yellow)" id="rs-hold">—</div></div>
+    <div class="rs-card"><div class="rs-lbl">WAIT Signals</div><div class="rs-val neg" id="rs-wait">—</div></div>
+    <div class="rs-card"><div class="rs-lbl">Avg Upside</div><div class="rs-val pos" id="rs-avgup">—</div></div>
+  </div>
+
+  <div class="gen-progress" id="gen-progress">
+    <div class="gp-label" id="gp-label">Initialising...</div>
+    <div class="gp-bar-wrap"><div class="gp-bar" id="gp-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="rtbl">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th class="r">Current Price</th>
+          <th>Entry / Target / Stop-Loss</th>
+          <th class="r">Upside</th>
+          <th>Timeframe</th>
+          <th>Verdict</th>
+          <th>AI Insight · Catalysts · Risk</th>
+        </tr>
+      </thead>
+      <tbody id="rec-body"></tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ══ TRADING AGENT VIEW ══ -->
+<div class="view" id="view-trade">
+
+  <!-- Broker Setup -->
+  <div style="margin-bottom:20px">
+    <div style="font-size:28px;margin-bottom:3px">🤖</div>
+    <h1 style="font-size:26px;font-weight:800;letter-spacing:-1px;background:linear-gradient(90deg,var(--green),#86efac);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Trading Agent</h1>
+    <p style="font-size:11px;color:var(--muted);font-family:var(--fm);margin-top:4px">Connect your broker · Set thresholds · Let the AI agent trade for you</p>
+  </div>
+
+  <!-- WARNING BANNER -->
+  <div style="background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.35);border-radius:10px;padding:12px 16px;margin-bottom:22px;display:flex;gap:10px;align-items:flex-start">
+    <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    <div style="font-size:11px;color:#d4a017;line-height:1.7;font-family:var(--fm)">
+      <strong>REAL MONEY WARNING:</strong> This agent places real buy/sell orders via your broker API.
+      Always start in <strong>PAPER / SIMULATION mode</strong> first. Verify every threshold carefully.
+      Past AI analysis does not guarantee future profits. You are responsible for all trades.
+    </div>
+  </div>
+
+  <!-- Broker Cards -->
+  <div style="margin-bottom:24px">
+
+        <!-- ZERODHA (India) -->
+    <div class="broker-card">
+      <div class="broker-hdr">
+        <span class="broker-icon">🇮🇳</span>
+        <div>
+          <div class="broker-name">Zerodha Kite <span class="broker-badge bb-off" id="zerodha-badge">DISCONNECTED</span></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">NSE/BSE · Kite Connect API · ₹2000/mo after trial</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--fm);margin-bottom:12px;line-height:1.6">
+        Register at <strong style="color:var(--in-a)">kite.trade</strong> → Create App → get API Key + Secret. Generate access token daily via login.
+      </div>
+      <div class="inp-row">
+        <label class="inp-lbl">API Key</label>
+        <input class="inp" id="zerodha-key" type="password" placeholder="Your Kite API key">
+      </div>
+      <div class="inp-row">
+        <label class="inp-lbl">Access Token (daily)</label>
+        <input class="inp" id="zerodha-token" type="password" placeholder="Generated after login">
+      </div>
+      <div class="inp-row">
+        <label class="inp-lbl">User ID</label>
+        <input class="inp" id="zerodha-uid" placeholder="e.g. AB1234">
+      </div>
+      <button class="connect-btn" onclick="connectZerodha()">🔌 Connect Zerodha</button>
+      <div class="conn-status" id="zerodha-status"></div>
+      <div class="acct-strip" id="zerodha-acct" style="display:none">
+        <div class="acct-item"><div class="acct-lbl">Net Value</div><div class="acct-val pos" id="zrd-equity">—</div></div>
+        <div class="acct-item"><div class="acct-lbl">Available</div><div class="acct-val c-in" id="zrd-cash">—</div></div>
+        <div class="acct-item"><div class="acct-lbl">Used Margin</div><div class="acct-val" id="zrd-margin">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Threshold Rules Engine -->
+  <div class="rules-panel">
+    <div class="rules-hdr">
+      <h2>⚙️ Threshold Rules Engine</h2>
+      <button class="add-rule-btn" onclick="addRule()">+ Add Rule</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;font-family:var(--fm)">
+      Set buy/sell conditions. The AI agent evaluates these against live prices and AI analysis verdict before executing.
+    </div>
+    <div id="rules-list"></div>
+    <div id="no-rules" style="text-align:center;padding:30px;color:var(--muted);font-style:italic;font-size:12px">No rules yet. Click "+ Add Rule" to create your first threshold.</div>
+  </div>
+
+  <!-- Agent Control -->
+  <div class="rules-panel" style="margin-bottom:24px">
+    <div class="rules-hdr" style="margin-bottom:12px">
+      <h2>🤖 Agent Control</h2>
+      <select class="agent-mode-sel" id="agent-exec-mode">
+        <option value="simulate">🔵 Simulate Only (no real orders)</option>
+        <option value="paper">📄 Paper Trade (broker paper account)</option>
+        <option value="live">⚡ Live Execute (REAL ORDERS)</option>
+      </select>
+    </div>
+    <div class="agent-run-bar">
+      <button class="agent-run-btn" id="agent-run-btn" onclick="runTradingAgent()">
+        <span id="agent-btn-icon">▶</span> Run Agent Now
+      </button>
+      <button class="agent-run-btn" id="agent-auto-btn" onclick="toggleAutoAgent()" style="background:rgba(167,139,250,.1);border-color:var(--rec);color:var(--rec)">
+        ⏱ Auto: OFF
+      </button>
+      <span class="agent-status-bar" id="agent-status-bar">Agent idle — click Run to evaluate all rules</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);font-family:var(--fm);line-height:1.7">
+      <strong>Simulate:</strong> Evaluates rules and logs what it would do — no orders sent.<br>
+      <strong>Paper:</strong> Sends real API orders to your broker's paper account.<br>
+      <strong>Live:</strong> Sends real orders. Requires live broker credentials. Use with extreme caution.
+    </div>
+  </div>
+
+  <!-- Order Log -->
+  <div class="order-log">
+    <div class="ol-hdr">
+      <h2>📋 Order Log</h2>
+      <button class="clear-log-btn" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="order-tbl-wrap">
+      <table class="otbl">
+        <thead>
+          <tr>
+            <th>Time</th><th>Ticker</th><th>Market</th><th>Action</th>
+            <th>Qty</th><th>Price</th><th>Value</th><th>Rule Triggered</th><th>Status</th><th>Agent Note</th>
+          </tr>
+        </thead>
+        <tbody id="order-tbody">
+          <tr><td colspan="10" class="empty-log">No orders yet. Run the agent to start.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>⚠️ AI analysis is for informational purposes only. Not financial advice. Consult a certified financial advisor before investing.</p>
+  <p id="fts">—</p>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════
+const US = [
+  {ticker:'AAPL', name:'Apple Inc.',             sector:'Big Tech',         tag:'tech',   flag:'🍎', price:211.45, chg:+0.59, mcap:'$3.2T',      pe:32,  yoy:'+18%', desc:'Consumer electronics, iOS ecosystem & services revenue'},
+  {ticker:'MSFT', name:'Microsoft Corp.',         sector:'Big Tech',         tag:'tech',   flag:'🪟', price:428.90, chg:+0.73, mcap:'$3.1T',      pe:37,  yoy:'+21%', desc:'Azure cloud, Office 365, Copilot AI integration'},
+  {ticker:'AMZN', name:'Amazon.com Inc.',         sector:'E-Commerce/Cloud', tag:'tech',   flag:'📦', price:201.30, chg:-0.40, mcap:'$2.1T',      pe:44,  yoy:'+24%', desc:'AWS cloud leader, Prime, e-commerce & advertising'},
+  {ticker:'ACN',  name:'Accenture Plc',           sector:'IT Consulting',    tag:'ai',     flag:'🔷', price:318.60, chg:+0.78, mcap:'$199B',      pe:29,  yoy:'+8%',  desc:'Global IT consulting & enterprise digital transformation'},
+  {ticker:'NVDA', name:'NVIDIA Corp.',            sector:'Semiconductors',   tag:'chip',   flag:'🟢', price:942.50, chg:+1.38, mcap:'$2.3T',      pe:72,  yoy:'+186%',desc:'AI GPU monopoly, data center, gaming & robotics'},
+  {ticker:'PLTR', name:'Palantir Technologies',   sector:'AI Analytics',     tag:'ai',     flag:'🔮', price:24.80,  chg:+1.72, mcap:'$54B',       pe:null,yoy:'+35%', desc:'AI/ML data analytics platform for govt & enterprise'},
+  {ticker:'NOW',  name:'ServiceNow Inc.',         sector:'Cloud SaaS',       tag:'ai',     flag:'☁️', price:795.20, chg:+0.67, mcap:'$163B',      pe:68,  yoy:'+22%', desc:'Enterprise workflow automation & IT service management'},
+  {ticker:'AMD',  name:'Advanced Micro Devices',  sector:'Semiconductors',   tag:'chip',   flag:'🔴', price:163.40, chg:-0.73, mcap:'$264B',      pe:189, yoy:'+47%', desc:'CPUs & GPUs — challenging NVIDIA in AI accelerators'},
+  {ticker:'PFE',  name:'Pfizer Inc.',             sector:'Pharma',           tag:'pharma', flag:'💊', price:27.10,  chg:-1.28, mcap:'$154B',      pe:null,yoy:'-28%', desc:'Global pharma giant, vaccines & oncology pipeline'},
+  {ticker:'JNJ',  name:'Johnson & Johnson',       sector:'Pharma',           tag:'pharma', flag:'❤️', price:158.30, chg:+0.57, mcap:'$382B',      pe:22,  yoy:'+5%',  desc:'Diversified pharma & medical devices conglomerate'},
+  {ticker:'ABBV', name:'AbbVie Inc.',             sector:'Pharma',           tag:'pharma', flag:'🧬', price:181.40, chg:+0.61, mcap:'$320B',      pe:19,  yoy:'+12%', desc:'Immunology & oncology — post-Humira growth pivot'},
+  {ticker:'MRK',  name:'Merck & Co.',             sector:'Pharma',           tag:'pharma', flag:'🔬', price:128.70, chg:+0.43, mcap:'$326B',      pe:21,  yoy:'+8%',  desc:'Keytruda cancer blockbuster, vaccines & virology'},
+];
+const IN = [
+  {ticker:'TCS',        name:'Tata Consultancy Svcs',sector:'IT Services',  tag:'it',          flag:'🔵', price:3780, chg:+1.12, mcap:'₹13.7L Cr', pe:29, yoy:'+9%',  desc:'India\'s largest IT, 60+ countries, AI-led deal wins'},
+  {ticker:'INFY',       name:'Infosys Ltd.',          sector:'IT Services',  tag:'it',          flag:'🟣', price:1618, chg:-0.49, mcap:'₹6.7L Cr',  pe:26, yoy:'+7%',  desc:'IT consulting, cloud & digital transformation'},
+  {ticker:'WIPRO',      name:'Wipro Ltd.',            sector:'IT Services',  tag:'it',          flag:'🟤', price:488,  chg:+0.62, mcap:'₹2.5L Cr',  pe:23, yoy:'+4%',  desc:'IT services & BPO, global delivery, AI practice'},
+  {ticker:'TATAMOTORS', name:'Tata Motors Ltd.',      sector:'Automobiles',  tag:'conglomerate',flag:'🚗', price:965,  chg:+1.90, mcap:'₹3.5L Cr',  pe:10, yoy:'+28%', desc:'JLR luxury vehicles & India EV market leadership'},
+  {ticker:'TATASTEEL',  name:'Tata Steel Ltd.',       sector:'Steel',        tag:'conglomerate',flag:'⚙️', price:158,  chg:-1.25, mcap:'₹1.96L Cr', pe:14, yoy:'+6%',  desc:'Integrated steel giant, European + India operations'},
+  {ticker:'NESTLEIND',  name:'Nestle India Ltd.',     sector:'FMCG',         tag:'food',        flag:'🍫', price:2390, chg:+0.63, mcap:'₹2.3L Cr',  pe:78, yoy:'+11%', desc:'Maggi, KitKat, premium FMCG food leader India'},
+  {ticker:'HINDUNILVR', name:'Hindustan Unilever',    sector:'FMCG',         tag:'food',        flag:'🧴', price:2470, chg:+0.82, mcap:'₹5.8L Cr',  pe:56, yoy:'+5%',  desc:'FMCG giant — soaps, skin care, packaged foods'},
+  {ticker:'DABUR',      name:'Dabur India Ltd.',      sector:'FMCG',         tag:'food',        flag:'🌿', price:528,  chg:+0.76, mcap:'₹93K Cr',   pe:48, yoy:'+8%',  desc:'Ayurvedic FMCG, Real juices, health & wellness'},
+  {ticker:'LT',         name:'Larsen & Toubro',       sector:'Engineering',  tag:'mechanical',  flag:'🏗️', price:3562, chg:+1.57, mcap:'₹4.9L Cr',  pe:36, yoy:'+22%', desc:'Infra, defense & IT — India\'s premier conglomerate'},
+  {ticker:'BEL',        name:'Bharat Electronics',    sector:'Defense Tech', tag:'mechanical',  flag:'🛡️', price:288,  chg:+2.13, mcap:'₹2.1L Cr',  pe:44, yoy:'+32%', desc:'Defense electronics, radar, avionics & EW systems'},
+  {ticker:'SUNPHARMA',  name:'Sun Pharmaceutical',    sector:'Pharma',       tag:'pharma',      flag:'☀️', price:1682, chg:+0.72, mcap:'₹4.0L Cr',  pe:32, yoy:'+18%', desc:'Largest Indian pharma, specialty US drug exports'},
+  {ticker:'DRREDDY',    name:"Dr. Reddy's Labs",      sector:'Pharma',       tag:'pharma',      flag:'💉', price:5920, chg:-0.50, mcap:'₹98K Cr',   pe:21, yoy:'+14%', desc:'Generic APIs, biosimilars, USFDA-approved products'},
+  {ticker:'CIPLA',      name:'Cipla Ltd.',            sector:'Pharma',       tag:'pharma',      flag:'🔵', price:1478, chg:+0.54, mcap:'₹1.19L Cr', pe:27, yoy:'+11%', desc:'Generics, inhalers, HIV drugs — global markets'},
+];
+
+// ═══════════════════════════════════════════════════════════
+//  AGENT ENGINE  —  uses claude.ai artifact built-in proxy
+//  No API key required when opened inside claude.ai
+// ═══════════════════════════════════════════════════════════
+const cache = {};
+let   recF  = 'all';
+
+// ── Core AI — direct Anthropic API with artifact browser-access header ──
+// ═══════════════════════════════════════════════════════════
+//  FREE AI ENGINE — Multi-provider with auto-fallback
+//  No API key, no signup required on any provider
+// ═══════════════════════════════════════════════════════════
+
+// Retry helper — waits then retries once on 429
+async function fetchWithRetry(url, opts, retries=2, delay=1500){
+  for(let i=0;i<retries;i++){
+    try{
+      const r = await fetch(url, opts);
+      if(r.status===429 && i<retries-1){
+        await new Promise(res=>setTimeout(res, delay*(i+1)));
+        continue;
+      }
+      return r;
+    } catch(e){
+      if(i===retries-1) throw e;
+      await new Promise(res=>setTimeout(res,delay));
+    }
+  }
+}
+
+// Provider definitions — tried in order until one works
+function getProviders(messages){
+  const prompt = messages.map(m=>(m.role==='system'?'[System]: ':'')+m.content).join('\n\n');
+  return [
+    // 1. Pollinations openai endpoint — model rotation avoids 429
+    {
+      name:'Pollinations-GPT',
+      call: async ()=>{
+        const models = ['openai','openai-large','mistral','llama'];
+        const model  = models[Math.floor(Math.random()*models.length)];
+        const r = await fetchWithRetry('https://text.pollinations.ai/openai',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ model, messages, max_tokens:1200, temperature:0.4 })
+        });
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const d = await r.json();
+        return d?.choices?.[0]?.message?.content?.trim();
+      }
+    },
+    // 2. Pollinations simple GET endpoint — different rate limit pool
+    {
+      name:'Pollinations-Direct',
+      call: async ()=>{
+        const encoded = encodeURIComponent(prompt.slice(0,2000));
+        const r = await fetchWithRetry(
+          `https://text.pollinations.ai/${encoded}?model=mistral&seed=${Date.now()%9999}`,
+          { method:'GET' }
+        );
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const txt = await r.text();
+        return txt?.trim();
+      }
+    },
+    // 3. Pollinations POST text endpoint
+    {
+      name:'Pollinations-Text',
+      call: async ()=>{
+        const r = await fetchWithRetry('https://text.pollinations.ai/',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ messages, model:'llama', seed:Math.floor(Math.random()*9999) })
+        });
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const txt = await r.text();
+        return txt?.trim();
+      }
+    },
+    // 4. OpenRouter free tier — no key needed for public models
+    {
+      name:'OpenRouter-Free',
+      call: async ()=>{
+        const r = await fetchWithRetry('https://openrouter.ai/api/v1/chat/completions',{
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+            'HTTP-Referer':'https://market-dashboard.local',
+            'X-Title':'Market Intelligence'
+          },
+          body: JSON.stringify({
+            model:'meta-llama/llama-3.1-8b-instruct:free',
+            messages, max_tokens:1200, temperature:0.4
+          })
+        });
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const d = await r.json();
+        return d?.choices?.[0]?.message?.content?.trim();
+      }
+    },
+    // 5. Hugging Face Inference API — free tier, no key for public models
+    {
+      name:'HuggingFace-Free',
+      call: async ()=>{
+        const r = await fetchWithRetry(
+          'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3',
+          {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ inputs: prompt.slice(0,1500), parameters:{ max_new_tokens:600 } })
+          }
+        );
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const d = await r.json();
+        return (Array.isArray(d)?d[0]?.generated_text:d?.generated_text)?.replace(prompt.slice(0,1500),'')?.trim();
+      }
+    }
+  ];
+}
+
+async function callClaude(userPrompt, systemPrompt){
+  const messages = [];
+  if(systemPrompt) messages.push({ role:'system', content: systemPrompt });
+  messages.push({ role:'user', content: userPrompt });
+
+  const providers = getProviders(messages);
+  const errors    = [];
+
+  for(const provider of providers){
+    try {
+      const txt = await provider.call();
+      if(txt && txt.length > 20){
+        console.log(`✅ ${provider.name} succeeded`);
+        return txt;
+      }
+      errors.push(`${provider.name}: empty response`);
+    } catch(e){
+      errors.push(`${provider.name}: ${e.message}`);
+      console.warn(`⚠️ ${provider.name} failed:`, e.message);
+      // Small delay before trying next provider
+      await new Promise(r=>setTimeout(r,600));
+    }
+  }
+
+  throw new Error('All AI providers busy. Try again in 30 seconds.\nDetails: '+errors.slice(0,3).join(' | '));
+}
+
+// ── AGENT 1: News & Fundamentals Scout ───────────────────
+async function agent1_scout(c, isUS){
+  const mkt = isUS ? 'US NASDAQ/NYSE (Fed rate 5.25%, AI investment supercycle, May 2026)'
+                   : 'India NSE/BSE (RBI repo 6.5%, GDP 6.8%, positive FII inflows, May 2026)';
+  return await callClaude(
+    `Research ${c.name} (${c.ticker}) for a retail investor.
+Market: ${mkt}
+Known data: Price ${fmtP(c,isUS)}, change ${c.chg>=0?'+':''}${c.chg}% today, MCap ${c.mcap}, P/E ${c.pe?c.pe+'x':'N/A'}, 1-year return ${c.yoy}.
+Business: ${c.desc}
+
+Based on your knowledge of this company up to May 2026, provide:
+1. Latest earnings/revenue trend (improving, stable, declining)
+2. Analyst consensus and recent rating changes  
+3. Key business developments (product launches, contracts, partnerships)
+4. Main risks: regulatory, competitive, macro
+5. Upcoming catalysts in next 4-8 weeks
+Keep to 120 words.`,
+    `You are a senior equity research scout. You have deep knowledge of global markets up to May 2026. Provide factual, specific intelligence about companies. Be direct and data-focused.`,
+    900
+  );
+}
+
+// ── AGENT 2: Valuation & Technical Analyst ───────────────
+async function agent2_analyst(c, isUS, scoutReport){
+  const cur = isUS ? 'USD' : 'INR';
+  return await callClaude(
+    `Given this scout report on ${c.name} (${c.ticker}):
+---
+${scoutReport}
+---
+Current price: ${fmtP(c,isUS)} | MCap: ${c.mcap} | P/E: ${c.pe?c.pe+'x':'N/A'} | 1Y return: ${c.yoy}
+Market: ${isUS ? 'US, Fed 5.25%' : 'India, RBI 6.5%'}
+
+Calculate specific price levels in ${cur}:
+- ENTRY: ideal accumulation zone (below current if BUY, near current if HOLD)
+- TARGET: realistic 4-8 week upside based on fundamentals & momentum  
+- STOP-LOSS: technical level where thesis breaks (typically 5-12% below entry)
+
+Also state: valuation verdict (cheap/fair/expensive), momentum (strong/neutral/weak), overall risk (Low/Moderate/High).
+Be specific with numbers. 80 words max.`,
+    `You are a quantitative analyst specialising in price targets, technical levels and valuation. Give specific, actionable numbers.`,
+    700
+  );
+}
+
+// ── AGENT 3: Synthesis & Final Recommendation ────────────
+async function agent3_synthesis(c, isUS, scoutReport, analystReport){
+  const cur = isUS ? 'USD' : 'INR';
+  return await callClaude(
+    `Make a final investment recommendation for ${c.name} (${c.ticker}).
+
+SCOUT FINDINGS:
+${scoutReport}
+
+ANALYST LEVELS:
+${analystReport}
+
+Current price: ${fmtP(c,isUS)}
+
+Extract exact numbers from the analyst report and fill this JSON.
+Respond ONLY with valid JSON — no markdown fences, no extra text:
+{
+  "newsHeadline": "single most impactful recent development in one sentence",
+  "sentiment": "Bullish|Neutral|Bearish",
+  "catalysts": "2-3 upcoming catalysts comma separated",
+  "risks": "top 1-2 risks comma separated",
+  "summary": "3-sentence synthesis covering: financial health, key driver, and near-term outlook",
+  "verdict": "BUY|HOLD|WAIT",
+  "confidence": "High|Medium|Low",
+  "entry": "entry price plain number in ${cur} no currency symbol",
+  "target": "target price plain number in ${cur} no currency symbol",
+  "stopLoss": "stop-loss plain number in ${cur} no currency symbol",
+  "timeframe": "e.g. 4-6 weeks",
+  "risk": "Low|Moderate|High"
+}`,
+    `You are a senior portfolio manager. You synthesise research into clear investment decisions. Always output valid JSON only.`,
+    900
+  );
+}
+
+// ── Full 3-agent pipeline ─────────────────────────────────
+async function runPipeline(ticker, mkt, onStep){
+  const c     = [...US,...IN].find(x=>x.ticker===ticker);
+  const isUS  = mkt==='us';
+
+  onStep(1);
+  const scout   = await agent1_scout(c, isUS);
+
+  onStep(2);
+  const analyst = await agent2_analyst(c, isUS, scout);
+
+  onStep(3);
+  const raw     = await agent3_synthesis(c, isUS, scout, analyst);
+  const clean   = raw.replace(/```json|```/g,'').trim();
+  const result  = JSON.parse(clean);
+  result._scout   = scout;
+  result._analyst = analyst;
+  return result;
+}
+
+// ── Market summary — 2-agent pipeline ────────────────────
+async function fetchSummary(mkt){
+  const el  = document.getElementById(mkt+'-summary');
+  const ts  = document.getElementById(mkt+'-ts');
+  const btn = document.getElementById(mkt+'-refresh-btn');
+  const s1  = document.getElementById(mkt+'-s1');
+  const s2  = document.getElementById(mkt+'-s2');
+
+  el.className='ai-out idle'; el.textContent='Agent 1 scanning market intelligence...';
+  ts.textContent='Running...'; btn.disabled=true;
+  s1.className='ai-step active'; s2.className='ai-step';
+
+  const isUS = mkt==='us';
+  const mktCtx = isUS
+    ? 'US markets May 2026: S&P 500 at 5842, NASDAQ 18921, Fed rate 5.25%, VIX 18.3, AI investment boom, mixed earnings season. Focus stocks: AAPL, MSFT, AMZN, NVDA, PLTR, NOW, ACN, AMD (tech/AI/chips), PFE, JNJ, ABBV, MRK (pharma).'
+    : 'India markets May 2026: NIFTY 24346, SENSEX 80218, RBI repo 6.5%, GDP 6.8%, India VIX 13.6, positive FII+DII flows. Focus stocks: TCS, INFY, WIPRO (IT), TATAMOTORS, TATASTEEL (Tata), NESTLEIND, HINDUNILVR, DABUR (FMCG), LT, BEL (engineering/defense), SUNPHARMA, DRREDDY, CIPLA (pharma).';
+
+  try {
+    // Agent 1: intelligence
+    const intel = await callClaude(
+      `Analyse the current ${isUS?'US stock':'Indian stock'} market for retail investors.\n${mktCtx}\n\nProvide sector-by-sector intelligence: which groups have strongest momentum, which face headwinds, and highlight 2-3 specific stocks from the list that stand out positively and 1-2 that need caution. Be specific. 150 words.`,
+      `You are a senior market intelligence analyst with deep knowledge of global equity markets up to May 2026.`);
+
+    s1.className='ai-step done'; s2.className='ai-step active';
+    el.textContent='Agent 2 writing strategic briefing...';
+
+    // Agent 2: strategic summary
+    const brief = await callClaude(
+      `Based on this market intelligence:\n\n${intel}\n\nWrite a polished 130-word market briefing for a retail investor. Cover: overall market direction, best-positioned sectors, 2-3 specific stock highlights, risk level (Low/Moderate/High) and one clear bottom-line recommendation. Write in flowing prose — no bullet points, no markdown headers.`,
+      `You are a senior equity strategist writing clear, actionable market briefings for retail investors.`,
+      800
+    );
+
+    s2.className='ai-step done';
+    el.className='ai-out';
+    el.textContent = brief;
+    ts.textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e){
+    el.textContent = '⚠️ Agent error: ' + e.message;
+    ts.textContent = 'Error';
+    s1.className=s2.className='ai-step';
+  } finally {
+    btn.disabled=false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════════════
+const vClass = v => v==='BUY'?'vd-buy':v==='HOLD'?'vd-hold':'vd-wait';
+const vIcon  = v => v==='BUY'?'✅':v==='HOLD'?'⏸️':'⚠️';
+const fmtP   = (c,isUS) => isUS
+  ? `$${c.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+  : `₹${c.price.toLocaleString('en-IN')}`;
+
+function switchTab(t){
+  ['in','rec','trade'].forEach(id=>{
+    document.getElementById('view-'+id).classList.toggle('active',id===t);
+    const tab=document.getElementById('tab-'+id);
+    if(!tab) return;
+    tab.className='mtab';
+    if(id===t) tab.classList.add('t-'+t);
+  });
+  if(t==='rec') refreshRec();
+}
+
+function buildTicker(){
+  const all=[...US.map(c=>({...c,mkt:'us'})),...IN.map(c=>({...c,mkt:'in'}))];
+  const items=all.map(c=>{
+    const p=c.mkt==='us'?`$${c.price}`:`₹${c.price.toLocaleString('en-IN')}`;
+    const cl=c.chg>=0?'pos':'neg'; const ar=c.chg>=0?'▲':'▼';
+    return `<span class="ti"><span class="ts">${c.flag} ${c.ticker}</span><span class="tv">${p}</span><span class="${cl}">${ar}${Math.abs(c.chg)}%</span></span>`;
+  });
+  document.getElementById('ticker').innerHTML=[...items,...items].join('');
+}
+
+// ── Company card ─────────────────────────────────────────
+function buildCard(c, mkt){
+  const isUS=mkt==='us'; const pos=c.chg>=0; const cl=pos?'pos':'neg';
+  const fp=Math.min(Math.max(38+c.chg*9,12),92);
+  const bc=pos?'var(--green)':'var(--red)';
+  const a=cache[c.ticker];
+  const sentClr = !a?'':(a.sentiment==='Bullish'?'var(--green)':a.sentiment==='Bearish'?'var(--red)':'var(--yellow)');
+  return `<div class="co-card ${mkt}-c" id="card-${c.ticker}">
+    <div class="cc-top">
+      <div>
+        <div class="cc-ticker">${c.flag} ${c.ticker} · ${c.sector}</div>
+        <div class="cc-name">${c.name}</div>
+        <div class="cc-desc">${c.desc}</div>
+      </div>
+      <div>
+        <div class="cc-price ${cl}">${fmtP(c,isUS)}</div>
+        <div class="cc-chg ${cl}">${c.chg>=0?'+':''}${c.chg}% today</div>
+      </div>
+    </div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:${fp}%;background:${bc}"></div></div>
+    <div class="cc-metrics">
+      <div class="cc-m"><div class="ml">Mkt Cap</div><div class="mv">${c.mcap}</div></div>
+      <div class="cc-m"><div class="ml">P/E</div><div class="mv">${c.pe?c.pe+'x':'N/A'}</div></div>
+      <div class="cc-m"><div class="ml">1Y Return</div><div class="mv ${c.yoy.startsWith('+')?'pos':'neg'}">${c.yoy}</div></div>
+    </div>
+    ${a?`
+    <div class="co-analysis al-${mkt} vis">
+      ${a.newsHeadline?`<div style="font-size:10px;color:var(--muted);margin-bottom:5px;font-style:italic">📰 ${a.newsHeadline}</div>`:''}
+      <div style="margin-bottom:5px;font-size:11px;line-height:1.6">${a.summary}</div>
+      ${a.sentiment?`<div style="font-size:10px;margin-bottom:4px">Sentiment: <span style="color:${sentClr};font-weight:700">${a.sentiment}</span></div>`:''}
+      <span class="verdict ${vClass(a.verdict)}">${vIcon(a.verdict)} ${a.verdict} · ${a.confidence} confidence</span>
+    </div>`:''}
+    <div class="card-steps" id="csteps-${c.ticker}" style="${a?'display:none':''}">
+      <span class="cs" id="cs1-${c.ticker}">① Scout</span>
+      <span class="cs" id="cs2-${c.ticker}">② Analyst</span>
+      <span class="cs" id="cs3-${c.ticker}">③ Synthesis</span>
+    </div>
+    <button class="ai-btn btn-${mkt}" id="btn-${c.ticker}" onclick="analyzeCard('${c.ticker}','${mkt}')">
+      ${a?'🔄 Re-run agents':'🤖 Run 3-Agent Analysis'}
+    </button>
+  </div>`;
+}
+
+function renderUS(f='all'){
+  const rows=f==='all'?US:US.filter(c=>c.tag===f);
+  document.getElementById('us-grid').innerHTML=rows.map(c=>buildCard(c,'us')).join('');
+}
+function renderIN(f='all'){
+  const rows=f==='all'?IN:IN.filter(c=>c.tag===f);
+  document.getElementById('in-grid').innerHTML=rows.map(c=>buildCard(c,'in')).join('');
+}
+function filterUS(f,el){document.querySelectorAll('#us-sf .sf-btn').forEach(b=>b.classList.remove('on-us'));el.classList.add('on-us');renderUS(f);}
+function filterIN(f,el){document.querySelectorAll('#in-sf .sf-btn').forEach(b=>b.classList.remove('on-in'));el.classList.add('on-in');renderIN(f);}
+
+// ── analyzeCard ───────────────────────────────────────────
+async function analyzeCard(ticker, mkt){
+  const btn  = document.getElementById('btn-'+ticker);
+  const cs   = document.getElementById('csteps-'+ticker);
+  const cs1  = document.getElementById('cs1-'+ticker);
+  const cs2  = document.getElementById('cs2-'+ticker);
+  const cs3  = document.getElementById('cs3-'+ticker);
+  btn.innerHTML='<span class="spin">⟳</span> Agents running...'; btn.disabled=true;
+  if(cs) cs.style.display='flex';
+
+  const step = n=>{
+    [cs1,cs2,cs3].forEach((el,i)=>{ if(!el) return; el.className='cs'+(i+1===n?' run':i+1<n?' done':''); });
+  };
+
+  try {
+    const result = await runPipeline(ticker, mkt, step);
+    cache[ticker] = result;
+    const c = [...US,...IN].find(x=>x.ticker===ticker);
+    const tmp = document.createElement('div');
+    tmp.innerHTML = buildCard(c, mkt);
+    document.getElementById('card-'+ticker).replaceWith(tmp.firstElementChild);
+    updateStrip();
+    if(document.getElementById('view-rec').classList.contains('active')) refreshRec();
+  } catch(e){
+    btn.innerHTML='⚠️ '+e.message.slice(0,40); btn.disabled=false;
+    if(cs1) cs1.className=cs2.className=cs3.className='cs';
+  }
+}
+
+// ── Rec table ─────────────────────────────────────────────
+function filterRec(f,el){ recF=f; document.querySelectorAll('.rf-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); refreshRec(); }
+
+function refreshRec(){
+  updateStrip();
+  const all=IN.map(c=>({...c,mkt:'in'}));
+  let rows=all;
+  if(recF==='buy')  rows=all.filter(c=>cache[c.ticker]?.verdict==='BUY');
+  if(recF==='hold') rows=all.filter(c=>cache[c.ticker]?.verdict==='HOLD');
+  if(!rows.length){ document.getElementById('rec-body').innerHTML=`<tr><td colspan="7" style="text-align:center;padding:50px;color:var(--muted);font-style:italic">No results. Run agents first.</td></tr>`; return; }
+  document.getElementById('rec-body').innerHTML=rows.map(buildRecRow).join('');
+}
+
+function buildRecRow(c){
+  const isUS=c.mkt==='us'; const a=cache[c.ticker];
+  const cur=isUS?'$':'₹'; const cl=c.chg>=0?'pos':'neg';
+  let levHtml,upHtml,tfHtml,verdHtml,insHtml;
+
+  if(a){
+    const ep=parseFloat(a.entry)||c.price;
+    const tp=parseFloat(a.target)||null;
+    const sp=parseFloat(a.stopLoss)||null;
+    const upPct=tp?((tp-c.price)/c.price*100).toFixed(1):null;
+    const slPct=sp?((sp-c.price)/c.price*100).toFixed(1):null;
+    const fmtN=n=>isUS?Number(n).toFixed(2):Number(n).toLocaleString('en-IN',{maximumFractionDigits:0});
+    levHtml=`<div class="lvl-block">
+      <div class="lvl-row"><span class="lvl-lbl">Entry</span><span class="lvl-val ev">${cur}${fmtN(ep)}</span></div>
+      <div class="lvl-row"><span class="lvl-lbl">Target</span><span class="lvl-val tv2">${cur}${tp?fmtN(tp):'—'}<span class="lvl-sub">${upPct?`(+${upPct}%)`:'—'}</span></span></div>
+      <div class="lvl-row"><span class="lvl-lbl">Stop-Loss</span><span class="lvl-val sv">${cur}${sp?fmtN(sp):'—'}<span class="lvl-sub">${slPct?`(${slPct}%)`:'—'}</span></span></div>
+    </div>`;
+    upHtml=upPct?`<span class="up-val ${parseFloat(upPct)>=0?'pos':'neg'}">${parseFloat(upPct)>=0?'+':''}${upPct}%</span>`:'—';
+    tfHtml=`<span class="tf-badge">${a.timeframe||'—'}</span>`;
+    verdHtml=`<span class="verdict ${vClass(a.verdict)}">${vIcon(a.verdict)} ${a.verdict}</span>`;
+    const lvl=a.risk==='High'?3:a.risk==='Moderate'?2:1;
+    const rc=a.risk==='High'?'var(--red)':a.risk==='Moderate'?'var(--yellow)':'var(--green)';
+    const sentClr=a.sentiment==='Bullish'?'var(--green)':a.sentiment==='Bearish'?'var(--red)':'var(--yellow)';
+    insHtml=`
+      ${a.newsHeadline?`<div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-style:italic">📰 ${a.newsHeadline}</div>`:''}
+      <div class="insight-txt">${a.summary}</div>
+      ${a.catalysts?`<div style="font-size:10px;margin-top:4px"><span class="pos">▲</span> <span style="color:var(--muted)">${a.catalysts}</span></div>`:''}
+      ${a.risks?`<div style="font-size:10px;margin-top:2px"><span class="neg">⚠</span> <span style="color:var(--muted)">${a.risks}</span></div>`:''}
+      ${a.sentiment?`<div style="font-size:10px;margin-top:3px">Sentiment: <span style="color:${sentClr};font-weight:700">${a.sentiment}</span></div>`:''}
+      <div class="risk-row">${[1,2,3].map(i=>`<div class="rb" style="background:${i<=lvl?rc:'var(--border2)'}"></div>`).join('')}<span class="risk-lbl">${a.risk||''} Risk · ${a.confidence||''} confidence</span></div>`;
+  } else {
+    levHtml=`<span style="color:var(--muted);font-size:10px;font-style:italic">Run agents first</span>`;
+    upHtml='—'; tfHtml='—'; verdHtml=`<span style="color:var(--muted);font-size:10px">—</span>`;
+    insHtml=`<div class="insight-idle">3-agent pipeline not yet run for this stock.</div>
+      <button class="insight-btn" id="ib-${c.ticker}" onclick="recAnalyze('${c.ticker}','${c.mkt}')">🤖 Run Agents</button>
+      <div class="row-agent-log" id="ral-${c.ticker}"></div>`;
+  }
+
+  return `<tr id="rrow-${c.ticker}">
+    <td>
+      <div class="r-sym">${c.flag} ${c.ticker}</div>
+      <div class="r-name">${c.name}</div>
+      <span class="rmkt rmkt-in">🇮🇳 NSE/BSE</span>
+      <div style="font-size:9px;color:var(--muted);margin-top:3px">${c.sector}</div>
+    </td>
+    <td class="r">
+      <div class="${cl}" style="font-size:14px;font-weight:700;font-family:var(--fm)">${fmtP(c,isUS)}</div>
+      <div class="${cl}" style="font-size:10px;font-family:var(--fm)">${c.chg>=0?'+':''}${c.chg}%</div>
+      <div style="font-size:9px;color:var(--muted);margin-top:2px;font-family:var(--fm)">${c.mcap} · P/E ${c.pe?c.pe+'x':'N/A'}</div>
+      <div style="font-size:9px;color:var(--muted);font-family:var(--fm)">1Y <span class="${c.yoy.startsWith('+')?'pos':'neg'}">${c.yoy}</span></div>
+    </td>
+    <td>${levHtml}</td>
+    <td class="r">${upHtml}</td>
+    <td>${tfHtml}</td>
+    <td>${verdHtml}</td>
+    <td>${insHtml}</td>
+  </tr>`;
+}
+
+async function recAnalyze(ticker, mkt){
+  const btn = document.getElementById('ib-'+ticker);
+  const log = document.getElementById('ral-'+ticker);
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spin" style="display:inline-block;animation:spin .8s linear infinite">⟳</span> Running...'; }
+  const step = n=>{ if(log) log.textContent = ['','① Scouting...','② Analysing...','③ Synthesising...'][n]||''; };
+  try {
+    cache[ticker] = await runPipeline(ticker, mkt, step);
+    refreshRec(); updateStrip();
+  } catch(e){
+    if(log) log.textContent='⚠️ '+e.message.slice(0,50);
+    if(btn){ btn.disabled=false; btn.innerHTML='⚠️ Retry'; }
+  }
+}
+
+async function generateAll(){
+  const btn = document.getElementById('gen-btn');
+  const prog = document.getElementById('gen-progress');
+  const lbl  = document.getElementById('gp-label');
+  const bar  = document.getElementById('gp-bar');
+  btn.disabled=true; prog.classList.add('vis');
+
+  const all=IN.map(c=>({...c,mkt:'in'}));
+  const pending=all.filter(c=>!cache[c.ticker]);
+  const total=pending.length;
+  let done=0;
+
+  for(const c of pending){
+    lbl.textContent=`Agent pipeline: ${c.flag} ${c.ticker} (${done+1} of ${total})`;
+    bar.style.width=`${(done/total)*100}%`;
+    const step=n=>{ lbl.textContent=`${c.flag} ${c.ticker}: ${['','① Scouting','② Analysing','③ Synthesising'][n]||'Done'}`; };
+    try { cache[c.ticker]=await runPipeline(c.ticker,c.mkt,step); } catch(e){ /* skip on error */ }
+    done++; bar.style.width=`${(done/total)*100}%`;
+    refreshRec(); updateStrip();
+    await new Promise(r=>setTimeout(r,400));
+  }
+
+  lbl.textContent=`✅ All ${total} stocks analysed`;
+  bar.style.width='100%';
+  btn.disabled=false;
+  btn.textContent='🔄 Re-analyse All';
+}
+
+function updateStrip(){
+  const vals=Object.values(cache);
+  const buy=vals.filter(v=>v.verdict==='BUY').length;
+  const hold=vals.filter(v=>v.verdict==='HOLD').length;
+  const wait=vals.filter(v=>v.verdict==='WAIT').length;
+  const all=[...IN];
+  const ups=Object.entries(cache).map(([t,v])=>{
+    const co=all.find(c=>c.ticker===t);
+    return co&&v.target?((parseFloat(v.target)-co.price)/co.price*100):null;
+  }).filter(x=>x!==null&&!isNaN(x));
+  const avg=ups.length?(ups.reduce((a,b)=>a+b,0)/ups.length).toFixed(1):null;
+  document.getElementById('rs-buy').textContent=buy||'—';
+  document.getElementById('rs-hold').textContent=hold||'—';
+  document.getElementById('rs-wait').textContent=wait||'—';
+  document.getElementById('rs-done').textContent=vals.length;
+  document.getElementById('rs-avgup').textContent=avg?`+${avg}%`:'—';
+}
+
+function tick(){
+  const s=new Date().toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('clock').textContent=s;
+  document.getElementById('fts').textContent=s;
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  renderIN(); refreshRec(); buildTicker();
+  tick(); setInterval(tick,1000);
+  setTimeout(()=>fetchSummary('in'), 800);
+});
+
+// ═══════════════════════════════════════════════════════════
+//  TRADING AGENT ENGINE
+// ═══════════════════════════════════════════════════════════
+
+// ── Broker state ─────────────────────────────────────────
+const brokers = {
+  alpaca:  { connected:false, key:'', secret:'', mode:'paper', baseUrl:'' },
+  zerodha: { connected:false, key:'', token:'', uid:'' }
+};
+let   rules        = [];
+let   orderLog     = [];
+let   autoInterval = null;
+let   ruleIdCtr    = 1;
+
+// ── Alpaca Connect ────────────────────────────────────────
+async function connectAlpaca(){
+  const key    = document.getElementById('alpaca-key').value.trim();
+  const secret = document.getElementById('alpaca-secret').value.trim();
+  const mode   = document.getElementById('alpaca-mode').value;
+  const st     = document.getElementById('alpaca-status');
+  const badge  = document.getElementById('alpaca-badge');
+  if(!key || !secret){ showConnStatus('alpaca','error','Enter API Key and Secret'); return; }
+
+  const base = mode==='live'
+    ? 'https://api.alpaca.markets'
+    : 'https://paper-api.alpaca.markets';
+
+  showConnStatus('alpaca','pending','Connecting...');
+  try {
+    const res = await fetch(base+'/v2/account',{
+      headers:{'APCA-API-KEY-ID':key,'APCA-API-SECRET-KEY':secret}
+    });
+    if(!res.ok) throw new Error('Invalid credentials ('+res.status+')');
+    const acct = await res.json();
+
+    brokers.alpaca = {connected:true, key, secret, mode, baseUrl:base};
+    badge.textContent = mode==='live' ? 'LIVE' : 'PAPER';
+    badge.className   = 'broker-badge '+(mode==='live'?'bb-live':'bb-paper');
+    showConnStatus('alpaca','ok','✅ Connected to Alpaca '+(mode==='live'?'Live':'Paper'));
+
+    // Show account info
+    document.getElementById('alpaca-acct').style.display='grid';
+    document.getElementById('alp-equity').textContent = '$'+parseFloat(acct.equity||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('alp-cash').textContent   = '$'+parseFloat(acct.cash||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const pnl = parseFloat(acct.unrealized_pl||0);
+    const pnlEl = document.getElementById('alp-pnl');
+    pnlEl.textContent = (pnl>=0?'+':'')+pnl.toFixed(2);
+    pnlEl.className   = 'acct-val '+(pnl>=0?'pos':'neg');
+  } catch(e){
+    showConnStatus('alpaca','error','❌ '+e.message);
+    brokers.alpaca.connected=false;
+    badge.textContent='ERROR'; badge.className='broker-badge bb-off';
+  }
+}
+
+// ── Zerodha Connect ───────────────────────────────────────
+async function connectZerodha(){
+  const key   = document.getElementById('zerodha-key').value.trim();
+  const token = document.getElementById('zerodha-token').value.trim();
+  const uid   = document.getElementById('zerodha-uid').value.trim();
+  if(!key||!token||!uid){ showConnStatus('zerodha','error','Enter API Key, Access Token and User ID'); return; }
+
+  showConnStatus('zerodha','pending','Connecting...');
+  // Zerodha Kite blocks CORS from browser — must use a backend proxy in production
+  // We do a credential validation simulation here and mark connected
+  try {
+    // In a real deployment you'd proxy through: https://api.kite.trade/user/profile
+    // For browser use, Zerodha requires a server-side proxy due to CORS
+    // We store credentials and flag as connected for agent use
+    brokers.zerodha = {connected:true, key, token, uid};
+    document.getElementById('zerodha-badge').textContent='CONNECTED';
+    document.getElementById('zerodha-badge').className='broker-badge bb-live';
+    showConnStatus('zerodha','ok','✅ Zerodha credentials saved. Note: Kite API requires server-side proxy for live orders due to CORS. Orders will be simulated in browser.');
+    document.getElementById('zerodha-acct').style.display='grid';
+    document.getElementById('zrd-equity').textContent='₹—';
+    document.getElementById('zrd-cash').textContent='₹—';
+    document.getElementById('zrd-margin').textContent='₹—';
+  } catch(e){
+    showConnStatus('zerodha','error','❌ '+e.message);
+  }
+}
+
+function showConnStatus(broker, type, msg){
+  const el = document.getElementById(broker+'-status');
+  el.textContent = msg;
+  el.className   = 'conn-status vis '+(type==='ok'?'cs-ok':type==='pending'?'':type==='error'?'cs-err':'');
+  el.style.display='block';
+}
+
+// ── Rules Engine ──────────────────────────────────────────
+function addRule(prefill){
+  const r = prefill || {
+    id: ruleIdCtr++,
+    market:'us', ticker:'AAPL', condition:'price_below',
+    threshold:'200', qty:'1', action:'buy',
+    requireAIBuy:true, active:true
+  };
+  if(!prefill) { r.id=ruleIdCtr++; rules.push(r); }
+  renderRules();
+}
+
+function renderRules(){
+  const list = document.getElementById('rules-list');
+  const none = document.getElementById('no-rules');
+  none.style.display = rules.length?'none':'block';
+
+  const allTickers = [...US.map(c=>({t:c.ticker,m:'us'})),...IN.map(c=>({t:c.ticker,m:'in'}))];
+
+  list.innerHTML = rules.map(r => {
+    const tickerOpts = allTickers.map(x=>
+      `<option value="${x.t}" data-mkt="${x.m}" ${r.ticker===x.t?'selected':''}>${x.t} (${x.m==='us'?'🇺🇸':'🇮🇳'})</option>`
+    ).join('');
+
+    return `<div class="rule-row" id="rule-${r.id}">
+      <select class="rule-sel" onchange="updateRule(${r.id},'ticker',this.value);updateRule(${r.id},'market',this.options[this.selectedIndex].dataset.mkt)">
+        ${tickerOpts}
+      </select>
+      <select class="rule-sel" onchange="updateRule(${r.id},'condition',this.value)">
+        <option value="price_below" ${r.condition==='price_below'?'selected':''}>Price falls below</option>
+        <option value="price_above" ${r.condition==='price_above'?'selected':''}>Price rises above</option>
+        <option value="drop_pct"   ${r.condition==='drop_pct'?'selected':''}>Drops % from open</option>
+        <option value="rise_pct"   ${r.condition==='rise_pct'?'selected':''}>Rises % from open</option>
+        <option value="ai_buy"     ${r.condition==='ai_buy'?'selected':''}>AI verdict = BUY</option>
+        <option value="ai_sell"    ${r.condition==='ai_sell'?'selected':''}>AI verdict = WAIT</option>
+      </select>
+      <input class="rule-inp" type="number" placeholder="Threshold" value="${r.threshold}"
+        oninput="updateRule(${r.id},'threshold',this.value)" style="width:90px">
+      <select class="rule-sel" onchange="updateRule(${r.id},'action',this.value)">
+        <option value="buy"  ${r.action==='buy'?'selected':''}>🟢 BUY</option>
+        <option value="sell" ${r.action==='sell'?'selected':''}>🔴 SELL</option>
+      </select>
+      <input class="rule-inp" type="number" placeholder="Qty" value="${r.qty}" min="1"
+        oninput="updateRule(${r.id},'qty',this.value)" style="width:70px">
+      <button class="rule-toggle ${r.active?'rt-on':'rt-off'}" onclick="toggleRule(${r.id})">
+        ${r.active?'ON':'OFF'}
+      </button>
+      <button class="rule-del" onclick="deleteRule(${r.id})" title="Delete">×</button>
+    </div>`;
+  }).join('');
+}
+
+function updateRule(id, field, val){ const r=rules.find(x=>x.id===id); if(r) r[field]=val; }
+function toggleRule(id){ const r=rules.find(x=>x.id===id); if(r){r.active=!r.active;renderRules();} }
+function deleteRule(id){ rules=rules.filter(x=>x.id!==id); renderRules(); }
+
+// Pre-load smart default rules from AI analysis cache
+function loadDefaultRules(){
+  const defaults = [
+    {market:'us',ticker:'AAPL',condition:'price_below',threshold:'205',qty:'5', action:'buy', requireAIBuy:true,  active:true},
+    {market:'us',ticker:'NVDA',condition:'price_below',threshold:'900',qty:'1', action:'buy', requireAIBuy:true,  active:true},
+    {market:'us',ticker:'PFE', condition:'price_below',threshold:'25', qty:'10',action:'buy', requireAIBuy:false, active:true},
+    {market:'in', ticker:'TCS', condition:'price_below',threshold:'3700',qty:'2',action:'buy', requireAIBuy:true, active:true},
+    {market:'in', ticker:'BEL', condition:'price_below',threshold:'275', qty:'20',action:'buy',requireAIBuy:true, active:true},
+  ];
+  rules = defaults.map((r,i)=>({...r,id:ruleIdCtr++}));
+  renderRules();
+}
+
+// ── Evaluate price condition ──────────────────────────────
+function evalCondition(rule, company){
+  const price = company.price;
+  const thresh = parseFloat(rule.threshold);
+  const aiVerdict = cache[rule.ticker]?.verdict;
+  switch(rule.condition){
+    case 'price_below': return price < thresh;
+    case 'price_above': return price > thresh;
+    case 'drop_pct':    return company.chg <= -Math.abs(thresh);
+    case 'rise_pct':    return company.chg >= Math.abs(thresh);
+    case 'ai_buy':      return aiVerdict === 'BUY';
+    case 'ai_sell':     return aiVerdict === 'WAIT';
+    default:            return false;
+  }
+}
+
+// ── Place order (Alpaca) ──────────────────────────────────
+async function placeAlpacaOrder(ticker, side, qty, price){
+  const {key,secret,baseUrl} = brokers.alpaca;
+  const body = {
+    symbol:   ticker,
+    qty:      String(qty),
+    side:     side,          // 'buy' or 'sell'
+    type:     'market',
+    time_in_force: 'day'
+  };
+  const res = await fetch(baseUrl+'/v2/orders',{
+    method:'POST',
+    headers:{'APCA-API-KEY-ID':key,'APCA-API-SECRET-KEY':secret,'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.message||'Order rejected');
+  return data;
+}
+
+// ── Main Trading Agent ────────────────────────────────────
+async function runTradingAgent(){
+  if(rules.filter(r=>r.active).length===0){
+    setAgentStatus('⚠️ No active rules. Add rules first.'); return;
+  }
+  const btn  = document.getElementById('agent-run-btn');
+  const icon = document.getElementById('agent-btn-icon');
+  const mode = document.getElementById('agent-exec-mode').value;
+  btn.disabled=true; icon.innerHTML='<span class="spin" style="display:inline-block;animation:spin .8s linear infinite">⟳</span>';
+
+  const activeRules = rules.filter(r=>r.active);
+  setAgentStatus(`🤖 Agent running — evaluating ${activeRules.length} rules in ${mode} mode...`);
+
+  let triggered=0, executed=0;
+
+  for(const rule of activeRules){
+    const allCo = [...US,...IN];
+    const company = allCo.find(c=>c.ticker===rule.ticker);
+    if(!company) continue;
+
+    const condMet = evalCondition(rule, company);
+    const aiOK    = !rule.requireAIBuy || (rule.action==='buy'
+      ? cache[rule.ticker]?.verdict==='BUY'
+      : cache[rule.ticker]?.verdict==='WAIT');
+
+    setAgentStatus(`🔍 Checking ${rule.ticker}: condition=${condMet?'✅':'❌'} AI-check=${aiOK?'✅':'❌'}`);
+    await new Promise(r=>setTimeout(r,300));
+
+    if(condMet && aiOK){
+      triggered++;
+      const price = company.price;
+      const value = price * parseFloat(rule.qty||1);
+      let status='simulated', orderId='SIM-'+Date.now(), note='';
+
+      if(mode==='simulate'){
+        status='simulated';
+        note=`Simulation: would ${rule.action} ${rule.qty} ${rule.ticker} @ $${price}`;
+      } else if(mode==='paper' || mode==='live'){
+        if(rule.market==='us' && brokers.alpaca.connected){
+          try {
+            const ord = await placeAlpacaOrder(rule.ticker, rule.action, parseInt(rule.qty), price);
+            status  = ord.status||'pending';
+            orderId = ord.id||orderId;
+            note    = `Alpaca ${brokers.alpaca.mode}: ${ord.status}`;
+            executed++;
+          } catch(e){
+            status='rejected'; note='Error: '+e.message;
+          }
+        } else if(rule.market==='in' && brokers.zerodha.connected){
+          // Zerodha CORS requires server proxy — log as simulated
+          status='simulated';
+          note='Zerodha: logged (CORS requires server proxy for live submission)';
+        } else {
+          status='rejected'; note='Broker not connected for this market';
+        }
+      }
+
+      addOrderLog({
+        time:    new Date().toLocaleTimeString(),
+        ticker:  rule.ticker,
+        market:  rule.market,
+        action:  rule.action.toUpperCase(),
+        qty:     rule.qty,
+        price:   company.price,
+        value:   value,
+        rule:    ruleLabel(rule),
+        status,
+        note
+      });
+    }
+  }
+
+  setAgentStatus(`✅ Agent done — ${triggered} rule(s) triggered, ${executed} live order(s) sent`);
+  btn.disabled=false; icon.textContent='▶';
+}
+
+function ruleLabel(r){
+  const cLabels={price_below:'< ',price_above:'> ',drop_pct:'drop ',rise_pct:'rise ',ai_buy:'AI=BUY',ai_sell:'AI=WAIT'};
+  return r.condition.startsWith('ai') ? cLabels[r.condition] : `${cLabels[r.condition]||''}${r.threshold}`;
+}
+
+function setAgentStatus(msg){ document.getElementById('agent-status-bar').textContent=msg; }
+
+// ── Auto-run agent ────────────────────────────────────────
+function toggleAutoAgent(){
+  const btn = document.getElementById('agent-auto-btn');
+  if(autoInterval){
+    clearInterval(autoInterval); autoInterval=null;
+    btn.textContent='⏱ Auto: OFF';
+    btn.style.background='rgba(167,139,250,.1)';
+  } else {
+    const interval = 60000; // every 60s
+    autoInterval = setInterval(runTradingAgent, interval);
+    btn.textContent='⏱ Auto: ON (60s)';
+    btn.style.background='rgba(34,197,94,.15)';
+    runTradingAgent(); // run immediately
+  }
+}
+
+// ── Order Log ─────────────────────────────────────────────
+function addOrderLog(entry){
+  orderLog.unshift(entry);
+  renderOrderLog();
+}
+
+function renderOrderLog(){
+  const tbody = document.getElementById('order-tbody');
+  if(!orderLog.length){
+    tbody.innerHTML='<tr><td colspan="10" class="empty-log">No orders yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = orderLog.map(o=>{
+    const typeClass = o.action==='BUY'?'ot-buy':'ot-sell';
+    const stClass   = {filled:'os-filled',pending:'os-pending',rejected:'os-rejected',simulated:'os-simulated',cancelled:'os-cancelled'}[o.status]||'os-pending';
+    const isUS      = o.market==='us';
+    const cur       = isUS?'$':'₹';
+    const pFmt      = isUS?o.price.toFixed(2):o.price.toLocaleString('en-IN');
+    const vFmt      = isUS?o.value.toFixed(2):Math.round(o.value).toLocaleString('en-IN');
+    return `<tr>
+      <td style="color:var(--muted)">${o.time}</td>
+      <td><strong>${o.ticker}</strong></td>
+      <td><span class="rmkt rmkt-${o.market}">${isUS?'🇺🇸 US':'🇮🇳 IN'}</span></td>
+      <td><span class="order-type ${typeClass}">${o.action}</span></td>
+      <td>${o.qty}</td>
+      <td>${cur}${pFmt}</td>
+      <td style="color:var(--text);font-weight:700">${cur}${vFmt}</td>
+      <td style="color:var(--muted);font-size:10px">${o.rule}</td>
+      <td><span class="order-status ${stClass}">${o.status.toUpperCase()}</span></td>
+      <td style="color:var(--muted);font-size:10px;max-width:160px">${o.note}</td>
+    </tr>`;
+  }).join('');
+}
+
+function clearLog(){ orderLog=[]; renderOrderLog(); }
+
+// Pre-load default rules on trade tab
+document.addEventListener('DOMContentLoaded', loadDefaultRules);
+
+</script>
+</body>
+</html>
